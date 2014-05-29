@@ -6,29 +6,40 @@
 #include <StaticConstants.au3>
 #include <WindowsConstants.au3>
 
-Global $Radio1, $Radio2, $Radio3, $Radio4, $Radio5, $CustURL, $CustIP, $Input1, $Input5, $IPAddress1, $Label5, $rTimeOut, $TimeOut, $rTimeVal, $rTimeValv
+Global $Radio1, $Radio2, $Radio3, $Radio4, $Radio5, $CustURL, $CustIP, $Input1, $Input5, $IPAddress1, $Label5, $rTimeOut, $TimeOut, $rTimeVal, $rTimeValv, $T, $T1, $T2, $T3, $T4, $IPValue, $Input2, $Input3, $Input4, $Input5, $Input6
 
 MainGUI()
 
 Func MainGUI()
-   $Form1 = GUICreate("StatCheck", 619, 402, 192, 124)
-$Label1 = GUICtrlCreateLabel("> This program checks the status of a web server, if you don't have an internet connection, or for some", 8, 8, 488, 17)
-$Label2 = GUICtrlCreateLabel("reason something is preventing only you from getting a response from a webserver, than these results", 16, 24, 478, 17)
-$Label3 = GUICtrlCreateLabel("don't actually reflect the status of  the server!", 16, 40, 224, 17)
-$Radio1 = GUICtrlCreateRadio("DarkRP Reloaded game server", 56, 120, 321, 17)
+$Form1_1 = GUICreate("StatCheck", 620, 402, 191, 123)
+$Label1 = GUICtrlCreateLabel("> This program checks the status of a web server, if you don't have an internet connection, or for some", 8, 24, 488, 17)
+$Label2 = GUICtrlCreateLabel("reason something is preventing only you from getting a response from a webserver, than these results", 16, 40, 478, 17)
+$Label3 = GUICtrlCreateLabel("don't actually reflect the status of  the server!", 16, 56, 224, 17)
+$Radio1 = GUICtrlCreateRadio("DarkRP Reloaded game server (192.223.30.11)", 56, 120, 321, 17)
 GUICtrlSetState(-1, $GUI_CHECKED)
-$Radio2 = GUICtrlCreateRadio("DarkRP Reloaded TeamSpeak", 56, 144, 337, 17)
-$Radio3 = GUICtrlCreateRadio("DarkRP Reloaded Website", 56, 168, 289, 17)
+$Radio2 = GUICtrlCreateRadio("DarkRP Reloaded TeamSpeak (ts3.darkrpreloaded.com)", 56, 144, 337, 17)
+$Radio3 = GUICtrlCreateRadio("DarkRP Reloaded Website (http://darkrpreloaded.com/", 56, 168, 289, 17)
 $Radio4 = GUICtrlCreateRadio("Custom URL:", 56, 192, 81, 17)
-$Radio5 = GUICtrlCreateRadio("Custom IP address:", 56, 216, 105, 17)
+$Radio5 = GUICtrlCreateRadio("Custom IP adress:", 56, 216, 111, 17)
 $Label4 = GUICtrlCreateLabel("Check:", 56, 104, 38, 17)
 $Input1 = GUICtrlCreateInput("Input custom URL", 144, 192, 121, 21)
-$IPAddress1 = GUICtrlCreateInput("Input custom IP", 168, 216, 177, 19)
 $Button1 = GUICtrlCreateButton("Check Status!", 208, 272, 193, 41)
 $Button2 = GUICtrlCreateButton("Help!", 504, 0, 57, 25)
 $Button3 = GUICtrlCreateButton("About!", 560, 0, 57, 25)
 $Button4 = GUICtrlCreateButton("Advanced Settings", 56, 240, 121, 17)
-$Label5 = GUICtrlCreateLabel(" ", 199, 320, 207, 17, $SS_CENTER)
+$Label5 = GUICtrlCreateLabel("", 199, 320, 207, 17, $SS_CENTER)
+$Label6 = GUICtrlCreateLabel("Created by: Vort3chs", 0, 0, 103, 17)
+$Input6 = GUICtrlCreateInput("", 167, 216, 25, 21)
+$Input2 = GUICtrlCreateInput("", 202, 216, 25, 21)
+$Input3 = GUICtrlCreateInput("", 240, 216, 25, 21)
+$Input4 = GUICtrlCreateInput("", 276, 216, 25, 21)
+$Label7 = GUICtrlCreateLabel("<--- Input custom IP", 302, 219, 96, 17)
+$Label8 = GUICtrlCreateLabel(".", 194, 213, 7, 33)
+GUICtrlSetFont(-1, 19, 400, 0, "MS Sans Serif")
+$Label10 = GUICtrlCreateLabel(".", 268, 213, 7, 33)
+GUICtrlSetFont(-1, 19, 400, 0, "MS Sans Serif")
+$Label11 = GUICtrlCreateLabel(".", 230, 213, 10, 33)
+GUICtrlSetFont(-1, 19, 400, 0, "MS Sans Serif")
 GUISetState(@SW_SHOW)
 
 While 1
@@ -117,6 +128,15 @@ WEnd
 EndFunc   ;==>HelpGUI
 
 Func Button1()
+   $T = "."
+   $T2 = GuiCtrlRead($Input6)
+   $T3 = GuiCtrlRead($Input2)
+   $T4 = GuiCtrlRead($Input3)
+   $T5 = GuiCtrlRead($Input4)
+
+   $IPValue = $T2 & $T & $T3 & $T & $T4 & $T & $T5
+
+MsgBox(0, "TEST VALUE:",$IPValue)
    $rTimeVal = GUICtrlRead($TimeOut)
    Switch  $rTimeVal
 	  Case 0
@@ -207,13 +227,12 @@ EndFunc   ;==>CustStat
 
 Func CustIPStat()
    GUICtrlSetData($Label5,"Checking...")
-   $CustIP = GuiCtrlRead($IPAddress1)
    $rTimeOut = GUICtrlRead($TimeOut)
    Switch $rTimeValv
 	  Case 0
-		 Ping($CustIP, 5000)
+		 Ping($IPValue, 5000)
 	  Case 1
-		 Ping($CustIP, $rTimeOut)
+		 Ping($IPValue, $rTimeOut)
    EndSwitch
    If @error <> 0 Then
 	  GUICtrlSetData($Label5,"There was an error!")
