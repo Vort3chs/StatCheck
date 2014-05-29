@@ -18,9 +18,9 @@ $Label3 = GUICtrlCreateLabel("don't actually reflect the status of  the server!"
 $Radio1 = GUICtrlCreateRadio("DarkRP Reloaded game server (192.223.30.11)", 56, 120, 321, 17)
 GUICtrlSetState(-1, $GUI_CHECKED)
 $Radio2 = GUICtrlCreateRadio("DarkRP Reloaded TeamSpeak (ts3.darkrpreloaded.com)", 56, 144, 337, 17)
-$Radio3 = GUICtrlCreateRadio("DarkRP Reloaded Website (http://darkrpreloaded.com/", 56, 168, 289, 17)
+$Radio3 = GUICtrlCreateRadio("DarkRP Reloaded Website (http://darkrpreloaded.com/)", 56, 168, 289, 17)
 $Radio4 = GUICtrlCreateRadio("Custom URL:", 56, 192, 81, 17)
-$Radio5 = GUICtrlCreateRadio("Custom IP adress:", 56, 216, 111, 17)
+$Radio5 = GUICtrlCreateRadio("Custom IP address:", 56, 216, 111, 17)
 $Label4 = GUICtrlCreateLabel("Check:", 56, 104, 38, 17)
 $Input1 = GUICtrlCreateInput("Input custom URL", 144, 192, 121, 21)
 $Button1 = GUICtrlCreateButton("Check Status!", 208, 272, 193, 41)
@@ -55,6 +55,7 @@ While 1
 		 Case $Button2
 			HelpGUI()
 	  EndSwitch
+
    WEnd
 EndFunc   ;==>MainGUI
 
@@ -136,7 +137,6 @@ Func Button1()
 
    $IPValue = $T2 & $T & $T3 & $T & $T4 & $T & $T5
 
-MsgBox(0, "TEST VALUE:",$IPValue)
    $rTimeVal = GUICtrlRead($TimeOut)
    Switch  $rTimeVal
 	  Case 0
@@ -219,9 +219,18 @@ Func CustStat()
 		 Ping($CustURL, $rTimeOut)
    EndSwitch
    If @error <> 0 Then
-	  GUICtrlSetData($Label5,"There was an error!")
+	  Switch @error
+		 Case 1
+			GUICtrlSetData($Label5,"ERROR: Host is offline!")
+		 Case 2
+			GUICtrlSetData($Label5,"ERROR: Host is unreachable!")
+		 Case 3
+			GUICtrlSetData($Label5,"ERROR: Bad destination!")
+		 Case 4
+			GUICtrlSetData($Label5,"ERROR: Unknown Error Occured!")
+	  EndSwitch
    Else
-	  GUICtrlSetData($Label5,"The webserver is up!")
+	  GUICtrlSetData($Label5,"The webserver responded!")
    EndIf
 EndFunc   ;==>CustStat
 
@@ -235,7 +244,16 @@ Func CustIPStat()
 		 Ping($IPValue, $rTimeOut)
    EndSwitch
    If @error <> 0 Then
-	  GUICtrlSetData($Label5,"There was an error!")
+	  Switch @error
+		 Case 1
+			GUICtrlSetData($Label5,"ERROR: Host is offline!")
+		 Case 2
+			GUICtrlSetData($Label5,"ERROR: Host is unreachable!")
+		 Case 3
+			GUICtrlSetData($Label5,"ERROR: Bad destination!")
+		 Case 4
+			GUICtrlSetData($Label5,"ERROR: Unknown Error Occured!")
+	  EndSwitch
    Else
 	  GUICtrlSetData($Label5,"The server responded!")
    EndIf
