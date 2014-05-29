@@ -23,8 +23,7 @@ $Radio4 = GUICtrlCreateRadio("Custom URL:", 56, 192, 81, 17)
 $Radio5 = GUICtrlCreateRadio("Custom IP address:", 56, 216, 105, 17)
 $Label4 = GUICtrlCreateLabel("Check:", 56, 104, 38, 17)
 $Input1 = GUICtrlCreateInput("Input custom URL", 144, 192, 121, 21)
-$IPAddress1 = _GUICtrlIpAddress_Create($Form1, 168, 216, 177, 19, -1, $WS_EX_STATICEDGE)
-_GUICtrlIpAddress_Set($IPAddress1, "0.0.0.0")
+$IPAddress1 = GUICtrlCreateInput("Input custom IP", 168, 216, 177, 19)
 $Button1 = GUICtrlCreateButton("Check Status!", 208, 272, 193, 41)
 $Button2 = GUICtrlCreateButton("Help!", 504, 0, 57, 25)
 $Button3 = GUICtrlCreateButton("About!", 560, 0, 57, 25)
@@ -195,9 +194,9 @@ Func CustStat()
    $rTimeOut = GUICtrlRead($TimeOut)
    Switch $rTimeValv
 	  Case 0
-		 Ping("$CustURL", 5000)
+		 Ping($CustURL, 5000)
 	  Case 1
-		 Ping("$CustURL", $rTimeOut)
+		 Ping($CustURL, $rTimeOut)
    EndSwitch
    If @error <> 0 Then
 	  GUICtrlSetData($Label5,"There was an error!")
