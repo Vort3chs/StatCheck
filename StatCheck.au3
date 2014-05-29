@@ -165,9 +165,17 @@ Func GMStat()
 	  Case 1
 		 Ping("192.223.30.11", $rTimeOut)
    EndSwitch
-
    If @error <> 0 Then
-	  GUICtrlSetData($Label5,"There was an error!")
+	  Switch @error
+		 Case 1
+			GUICtrlSetData($Label5,"ERROR: Host is offline!")
+		 Case 2
+			GUICtrlSetData($Label5,"ERROR: Host is unreachable!")
+		 Case 3
+			GUICtrlSetData($Label5,"ERROR: Bad destination!")
+		 Case 4
+			GUICtrlSetData($Label5,"ERROR: Unknown Error Occured!")
+	  EndSwitch
    Else
 	  GUICtrlSetData($Label5,"The game server is up!")
    EndIf
@@ -184,11 +192,19 @@ Func TSStat()
 		 Ping("ts3.darkrpreloaded.com", $rTimeOut)
    EndSwitch
    If @error <> 0 Then
-	  GUICtrlSetData($Label5,"There was an error!")
+	  Switch @error
+		 Case 1
+			GUICtrlSetData($Label5,"ERROR: Host is offline!")
+		 Case 2
+			GUICtrlSetData($Label5,"ERROR: Host is unreachable!")
+		 Case 3
+			GUICtrlSetData($Label5,"ERROR: Bad destination!")
+		 Case 4
+			GUICtrlSetData($Label5,"ERROR: Unknown Error Occured!")
+	  EndSwitch
    Else
 	  GUICtrlSetData($Label5,"The TeamSpeak server is up!")
    EndIf
-
 EndFunc   ;==>TSStat
 
 Func WSStat()
@@ -202,9 +218,18 @@ Func WSStat()
 		 Ping("darkrpreloaded.com", $rTimeOut)
    EndSwitch
    If @error <> 0 Then
-	  GUICtrlSetData($Label5,"There was an error!")
+	  Switch @error
+		 Case 1
+			GUICtrlSetData($Label5,"ERROR: Host is offline!")
+		 Case 2
+			GUICtrlSetData($Label5,"ERROR: Host is unreachable!")
+		 Case 3
+			GUICtrlSetData($Label5,"ERROR: Bad destination!")
+		 Case 4
+			GUICtrlSetData($Label5,"ERROR: Unknown Error Occured!")
+	  EndSwitch
    Else
-	  GUICtrlSetData($Label5,"The web site is up!")
+	  GUICtrlSetData($Label5,"The website is up!")
    EndIf
 EndFunc   ;==>WSStat
 
