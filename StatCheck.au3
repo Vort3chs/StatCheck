@@ -1,5 +1,4 @@
-#include <ButtonConstants.au3>
-#RequireAdmin
+#RequireAdmin ;;Need this to read/write/create config file in ProgramFiles.
 
 #include <ButtonConstants.au3>
 #include <EditConstants.au3>
