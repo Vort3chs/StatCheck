@@ -1,18 +1,22 @@
 #include <ButtonConstants.au3>
+#RequireAdmin
+
+#include <ButtonConstants.au3>
 #include <EditConstants.au3>
 #include <GUIConstantsEx.au3>
 #include <StaticConstants.au3>
 #include <WindowsConstants.au3>
 #include <Date.au3>
+#include <Inet.au3>
 
-Global $CustURL, $CustIP, $rTimeOut, $TimeOut, $T, $T1, $T2, $T3, $T4, $IPValue, $IPStat, $GSStat, $WSStat, $TSStat, $URLStat, $fPos, $TimeVal
+Global $CustURL, $CustIP, $rTimeOut, $TimeOut, $T, $T1, $T2, $T3, $T4, $IPValue, $IPStat, $GSStat, $WSStat, $TSStat, $URLStat, $fPos, $TimeVal, $InfoVal, $HostVal
 
 MainGUI()
 
 Func MainGUI()
 $TimeOut = 5000
 
-   Global $Form1_1 = GUICreate("StatCheck", 621, 403, 207, 188)
+Global $Form1_1 = GUICreate("StatCheck v1.05", 619, 405, 570, 397)
 Global $Label1 = GUICtrlCreateLabel("> This program checks the status of a web server, if you don't have an internet connection, or for some", 8, 24, 488, 17)
 Global $Label2 = GUICtrlCreateLabel("reason something is preventing only you from getting a response from a webserver, than these results", 16, 40, 478, 17)
 Global $Label3 = GUICtrlCreateLabel("don't actually reflect the status of  the server!", 16, 56, 224, 17)
@@ -25,9 +29,11 @@ Global $Radio5 = GUICtrlCreateRadio("Custom IP address:", 56, 216, 111, 17)
 Global $Label4 = GUICtrlCreateLabel("Check:", 56, 104, 38, 17)
 Global $Input1 = GUICtrlCreateInput("Input custom URL", 144, 192, 121, 21)
 Global $Button1 = GUICtrlCreateButton("Check Status!", 208, 272, 193, 41)
+GUICtrlSetCursor (-1, 0)
 Global $Button2 = GUICtrlCreateButton("Help!", 504, 0, 57, 25)
 Global $Button3 = GUICtrlCreateButton("About!", 560, 0, 57, 25)
 Global $Button4 = GUICtrlCreateButton("Advanced Settings", 56, 240, 121, 17)
+GUICtrlSetCursor (-1, 0)
 Global $Label5 = GUICtrlCreateLabel("", 199, 320, 207, 17, $SS_CENTER)
 Global $Label6 = GUICtrlCreateLabel("Created by: Vort3chs", 0, 0, 103, 17)
 Global $Input6 = GUICtrlCreateInput("", 167, 216, 25, 21)
@@ -42,22 +48,42 @@ GUICtrlSetFont(-1, 19, 400, 0, "MS Sans Serif")
 Global $Label11 = GUICtrlCreateLabel(".", 230, 213, 6, 33)
 GUICtrlSetFont(-1, 19, 400, 0, "MS Sans Serif")
 Global $Label9 = GUICtrlCreateLabel("", 200, 342, 204, 17, $SS_CENTER)
-GUISetState()
+Global $Button5 = GUICtrlCreateButton("More Info", 272, 360, 65, 17)
+GUICtrlSetState($Button5, $GUI_HIDE)
+GUICtrlSetCursor (-1, 0)
+GUICtrlSetTip(-1, "More info about last ping")
+Global $Button6 = GUICtrlCreateButton("Clear Labels", 272, 376, 65, 17)
+GUICtrlSetState($Button6, $GUI_HIDE)
+GUICtrlSetCursor (-1, 0)
+Global $Button7 = GUICtrlCreateButton("Options", 448, 0, 57, 25)
+GUICtrlSetCursor (-1, 0)
+GUISetState(@SW_SHOW)
+If FileExists(@ProgramFilesDir & "\StatCheckSettings.txt") = 0 Then
+   FileWriteLine(@ProgramFilesDir & "\StatCheckSettings.txt", @DesktopDir & "\log.txt")
+EndIf
 
 While 1
 	  Switch GUIGetMsg()
 		 Case $GUI_EVENT_CLOSE
 			ExitLoop
 		 Case $Button3
-			GUISetState(@SW_DISABLE, $Form1_1)
+			GUICtrlSetState($Button3, $GUI_DISABLE)
 			AboutGUI()
-			GUISetState(@SW_ENABLE, $Form1_1)
+			GUICtrlSetState($Button3, $GUI_ENABLE)
 		 Case $Button1
 			Button1()
 		 Case $Button4
 			$TimeOut = InputBox("Advanced:","Default timeout value = 5000ms (5 seconds)" & @CRLF & @CRLF & "Custom timeout value(ms):", "5000","",249,147)
+		 Case $Button6
+			ClearLabels()
 		 Case $Button2
 			ShellExecute("http://vortechs.site11.com/Help.html")
+		 Case $Button5
+			MoreInfo()
+		 Case $Button7
+			GUICtrlSetState($Button7, $GUI_DISABLE)
+			OptionGUI()
+			GUICtrlSetState($Button7, $GUI_ENABLE)
 	  EndSwitch
    WEnd
 EndFunc   ;==>MainGUI
@@ -110,7 +136,30 @@ EndFunc   ;==>AboutGUI
 ;;   WEnd
 ;;EndFunc   ;==>AdvSetGUI GONE FOR NOW, KIND OF POINTLESS!
 
+Func OptionGUI()
+   Global $Option_GUI = GUICreate("Options", 588, 155, 516, 612)
+Global $Input1766 = GUICtrlCreateInput("", 104, 70, 433, 21)
+Global $Label198798 = GUICtrlCreateLabel("Log File Directory:", 16, 72, 87, 17)
+Global $Label11111 = GUICtrlCreateLabel("Default log file directory is the desktop, to change this enter a new directory and hit 'apply'", 77, 30, 431, 17)
+Global $Button1754 = GUICtrlCreateButton("Apply", 191, 116, 199, 24)
+GUISetState(@SW_SHOW)
+
+While 1
+	Switch GUIGetMsg()
+		Case $GUI_EVENT_CLOSE
+			GUIDelete($Option_GUI)
+			ExitLoop
+		 Case $Button1754
+			$SetDir = GUICtrlRead($Input1766)
+			FileDelete(@ProgramFilesDir & "\StatCheckSettings.txt")
+			FileWriteLine(@ProgramFilesDir & "\StatCheckSettings.txt", $SetDir)
+	EndSwitch
+WEnd
+EndFunc
+
 Func Button1()
+   $InfoVal = 0
+   GUICtrlSetState($Button6, $GUI_SHOW)
    GUICtrlSetColor($Label5, 0x000000)
    GUICtrlSetColor($Label9, 0x000000)
    GUICtrlSetData($Label9,"")
@@ -142,6 +191,7 @@ Func Button1()
 EndFunc   ;==>Button1
 
 Func GMStat()
+   $InfoVal = 1
    GUICtrlSetData($Label5,"Checking...")
    Switch $TimeVal
 	  Case 0
@@ -181,11 +231,13 @@ Func GMStat()
 	  GUICtrlSetColor($Label9, 0x00FF00)
 	  GUICtrlSetData($Label5,"The game server is up!")
 	  GUICtrlSetData($Label9,"Response time(ms): " & $GSStat)
+	  GUICtrlSetState($Button5, $GUI_SHOW)
 	  LogGSTrue()
    EndIf
 EndFunc   ;==>GMStat
 
 Func TSStat()
+   $InfoVal = 2
    GUICtrlSetData($Label5,"Checking...")
    Switch $TimeVal
 	  Case 0
@@ -225,11 +277,13 @@ Func TSStat()
 	  GUICtrlSetColor($Label9, 0x00FF00)
 	  GUICtrlSetData($Label5,"The TeamSpeak server is up!")
 	  GUICtrlSetData($Label9,"Response time(ms): " & $TSStat)
+	  GUICtrlSetState($Button5, $GUI_SHOW)
 	  LogTSTrue()
    EndIf
 EndFunc   ;==>TSStat
 
 Func WSStat()
+   $InfoVal = 3
    GUICtrlSetData($Label5,"Checking...")
    Switch $TimeVal
 	  Case 0
@@ -269,13 +323,16 @@ Func WSStat()
 	  GUICtrlSetColor($Label9, 0x00FF00)
 	  GUICtrlSetData($Label5,"The website is up!")
 	  GUICtrlSetData($Label9,"Response time(ms): " & $WSStat)
+	  GUICtrlSetState($Button5, $GUI_SHOW)
 	  LogWSTrue()
    EndIf
 EndFunc   ;==>WSStat
 
 Func CustStat()
+   $InfoVal = 4
    GUICtrlSetData($Label5,"Checking...")
    $CustURL = GuiCtrlRead($Input1)
+   If $CustURL = "Input custom URL" Then $CustURL = "NULL VALUE"
    Switch $TimeVal
 	  Case 0
 		 $URLStat = Ping($CustURL, 5000)
@@ -314,12 +371,15 @@ Func CustStat()
 	  GUICtrlSetColor($Label9, 0x00FF00)
 	  GUICtrlSetData($Label5,"The webserver responded!")
 	  GUICtrlSetData($Label9,"Response time(ms): " & $URLStat)
+	  GUICtrlSetState($Button5, $GUI_SHOW)
 	  LogURLTrue()
    EndIf
 EndFunc   ;==>CustStat
 
 Func CustIPStat()
+   $InfoVal = 5
    GUICtrlSetData($Label5,"Checking...")
+   If $IPValue = "..." Then $IPValue = "NULL VALUE"
    Switch $TimeVal
 	  Case 0
 		 $IPStat = Ping($IPValue, 5000)
@@ -358,48 +418,85 @@ Func CustIPStat()
 	  GUICtrlSetColor($Label9, 0x00FF00)
 	  GUICtrlSetData($Label5,"The server responded!")
 	  GUICtrlSetData($Label9,"Response time(ms): " & $IPStat)
+	  GUICtrlSetState($Button5, $GUI_SHOW)
 	  LogIPTrue()
    EndIf
 EndFunc   ;==>CustIPStat
 
 Func LogGSTrue()
-   FileWriteLine(@DesktopDir & "\log.txt", "You checked the status of the DarkRPReloaded game server @ " & _Now() & "(System Time) a response from the server was recieved in " & $GSStat & "ms!" & @CRLF & @CRLF)
+   $LogDir = FileReadLine(@ProgramFilesDir & "\StatCheckSettings.txt",1)
+   FileWriteLine($LogDir, "You checked the status of the DarkRPReloaded game server @ " & _Now() & "(System Time) a response from the server was recieved in " & $GSStat & "ms!" & @CRLF & @CRLF)
 EndFunc
 
 Func LogGSFalse()
-   FileWriteLine(@DesktopDir & "\log.txt", "You checked the status of the DarkRPReloaded game server @ " & _Now() & "(System Time) a response from the server was NOT recieved the server is probably down!" & @CRLF & @CRLF)
+   $LogDir = FileReadLine(@ProgramFilesDir & "\StatCheckSettings.txt",1)
+   FileWriteLine($LogDir, "You checked the status of the DarkRPReloaded game server @ " & _Now() & "(System Time) a response from the server was NOT recieved the server is probably down!" & @CRLF & @CRLF)
 EndFunc
 
 Func LogTSTrue()
-   FileWriteLine(@DesktopDir & "\log.txt", "You checked the status of the DarkRPReloaded TeamSpeak server @ " & _Now() & "(System Time) a response from the server was recieved in " & $TSStat & "ms!" & @CRLF & @CRLF)
+   $LogDir = FileReadLine(@ProgramFilesDir & "\StatCheckSettings.txt",1)
+   FileWriteLine($LogDir, "You checked the status of the DarkRPReloaded TeamSpeak server @ " & _Now() & "(System Time) a response from the server was recieved in " & $TSStat & "ms!" & @CRLF & @CRLF)
 EndFunc
 
 Func LogTSFalse()
-   FileWriteLine(@DesktopDir & "\log.txt", "You checked the status of the DarkRPReloaded TeamSpeak server @ " & _Now() & "(System Time) a response from the server was NOT recieved, the server is probably down!" & @CRLF & @CRLF)
+   $LogDir = FileReadLine(@ProgramFilesDir & "\StatCheckSettings.txt",1)
+   FileWriteLine($LogDir, "You checked the status of the DarkRPReloaded TeamSpeak server @ " & _Now() & "(System Time) a response from the server was NOT recieved, the server is probably down!" & @CRLF & @CRLF)
 EndFunc
 
 Func LogWSTrue()
-   FileWriteLine(@DesktopDir & "\log.txt", "You checked the status of the DarkRPReloaded website @ " & _Now() & "(System Time) a response from the server was recieved in " & $WSStat & "ms!" & @CRLF & @CRLF)
+   $LogDir = FileReadLine(@ProgramFilesDir & "\StatCheckSettings.txt",1)
+   FileWriteLine($LogDir, "You checked the status of the DarkRPReloaded website @ " & _Now() & "(System Time) a response from the server was recieved in " & $WSStat & "ms!" & @CRLF & @CRLF)
 EndFunc
 
 Func LogWSFalse()
-   FileWriteLine(@DesktopDir & "\log.txt", "You checked the status of the DarkRPReloaded website @ " & _Now() & "(System Time) a response from the server was NOT recieved, the server is probably down!" & @CRLF & @CRLF)
+   $LogDir = FileReadLine(@ProgramFilesDir & "\StatCheckSettings.txt",1)
+   FileWriteLine($LogDir, "You checked the status of the DarkRPReloaded website @ " & _Now() & "(System Time) a response from the server was NOT recieved, the server is probably down!" & @CRLF & @CRLF)
 EndFunc
 
 Func LogURLTrue()
-   $CustURL = GUICtrlRead($Input1)
-   FileWriteLine(@DesktopDir & "\log.txt", "You checked the status of " & $CustURL & " @ " & _Now() & "(System Time) a response from the server was recieved in " & $URLStat & "ms!" & @CRLF & @CRLF)
+   $LogDir = FileReadLine(@ProgramFilesDir & "\StatCheckSettings.txt",1)
+   FileWriteLine($LogDir, "You checked the status of " & $CustURL & " @ " & _Now() & "(System Time) a response from the server was recieved in " & $URLStat & "ms!" & @CRLF & @CRLF)
 EndFunc
 
 Func LogURLFalse()
-   $CustURL = GUICtrlRead($Input1)
-   FileWriteLine(@DesktopDir & "\log.txt", "You checked the status of " & $CustURL & " @ " & _Now() & "(System Time) a response from the server was NOT recieved, the server is probably down!" & @CRLF & @CRLF)
+   $LogDir = FileReadLine(@ProgramFilesDir & "\StatCheckSettings.txt",1)
+   FileWriteLine($LogDir, "You checked the status of " & $CustURL & " @ " & _Now() & "(System Time) a response from the server was NOT recieved, the server is probably down!" & @CRLF & @CRLF)
 EndFunc
 
 Func LogIPTrue()
-   FileWriteLine(@DesktopDir & "\log.txt", "You checked the status of " & $IPValue & " @ " & _Now() & "(System Time) a response from the server was recieved in " & $IPStat & "ms!" & @CRLF & @CRLF)
+   $LogDir = FileReadLine(@ProgramFilesDir & "\StatCheckSettings.txt",1)
+   FileWriteLine($LogDir, "You checked the status of " & $IPValue & " @ " & _Now() & "(System Time) a response from the server was recieved in " & $IPStat & "ms!" & @CRLF & @CRLF)
 EndFunc
 
 Func LogIPFalse()
-   FileWriteLine(@DesktopDir & "\log.txt", "You checked the status of " & $IPValue & " @ " & _Now() & "(System Time) a response from the server was NOT recieved, the server is probably down!" & @CRLF & @CRLF)
+   $LogDir = FileReadLine(@ProgramFilesDir & "\StatCheckSettings.txt",1)
+   FileWriteLine($LogDir, "You checked the status of " & $IPValue & " @ " & _Now() & "(System Time) a response from the server was NOT recieved, the server is probably down!" & @CRLF & @CRLF)
+EndFunc
+
+Func ClearLabels()
+   			GUICtrlSetData($Label5,"")
+			GUICtrlSetData($Label9,"")
+			GUICtrlSetState($Button6, $GUI_HIDE)
+			GUICtrlSetState($Button5, $GUI_HIDE)
+EndFunc
+
+Func MoreInfo()
+   TCPStartup()
+   Switch $InfoVal
+	  Case 1 ;;GMStat()
+	     $HostVal = _TCPIpToName("192.223.30.11")
+		 MsgBox(0,"More Info!", "Round-trip time: " & $GSStat & "ms" & @CRLF & @CRLF & "Hostname: " & $HostVal & @CRLF & @CRLF & "IP Address: 192.223.30.11")
+	  Case 2 ;;TSStat()
+	     $HostVal = TCPNameToIp("ts3.darkrpreloaded.com")
+		 MsgBox(0,"More Info!", "Round-trip time: " & $TSStat & "ms" & @CRLF & @CRLF & "Hostname: " & _TCPIpToName("216.52.148.11") & @CRLF & @CRLF & "IP Address: " & $HostVal)
+	  Case 3 ;;WSStat()
+	     $HostVal = TCPNameToIp("darkrpreloaded.com")
+		 MsgBox(0,"More Info!", "Round-trip time: " & $WSStat & "ms" & @CRLF & @CRLF & "Hostname: " & _TCPIpToName("208.146.35.22") & @CRLF & @CRLF & "IP Address: " & $HostVal)
+	  Case 4 ;;CustStat()
+	     $HostVal = TCPNameToIp($CustURL)
+		 MsgBox(0,"More Info!", "Round-trip time: " & $URLStat & "ms" & @CRLF & @CRLF & "Hostname: " & _TCPIpToName($HostVal) & @CRLF & @CRLF & "IP Address: " & $HostVal)
+	  Case 5 ;;CustIPStat()
+	     $HostVal = _TCPIpToName($IPValue)
+		 MsgBox(0,"More Info!", "Round-trip time: " & $IPStat & "ms" & @CRLF & @CRLF & "Hostname: " & _TCPIpToName($IPValue) & @CRLF & @CRLF & "IP Address: " & $IPValue)
+	  EndSwitch
 EndFunc
