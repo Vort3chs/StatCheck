@@ -1,3 +1,9 @@
+#cs
+    Created for the community of DarkRPReloaded.
+    I know what you're thinking, what's the point of this. . . Well, there isn'tuch point to is, it's just a nice little            hing to have sitting around.
+    This program works by a very simple concept, it pings the status of a server and gets its information.
+#ce
+
 #RequireAdmin ;;Need this to read/write/create config file in ProgramFiles.
 
 #include <ButtonConstants.au3>
